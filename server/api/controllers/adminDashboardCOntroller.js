@@ -1,14 +1,14 @@
+const { uploadImageToCloudinary } = require("../middleware/uploadMiddleware");
 const Campaign = require("../models/Campaign");
 const User = require("../models/User");
 
 // Helper function to generate unique Campaign IDs
-export const generateCampaignID = () =>
+const generateCampaignID = () =>
   "CMP-" + Math.random().toString(36).substring(2, 10).toUpperCase();
 
 const addNewClient = async (req, res) => {
   try {
     const {
-      logo,
       title,
       candidateName,
       office,
@@ -37,12 +37,30 @@ const addNewClient = async (req, res) => {
       });
     }
 
+    const logoFile = req.files?.logo?.[0];
+
+    if (!logoFile) {
+      return res.status(400).json({
+        success: false,
+        message: "Please upload the campaign logo",
+      });
+    }
+
+    const uploaded = await uploadImageToCloudinary(
+      logoFile.buffer,
+      "OCOA/Logos",
+    );
+
     const newCampaign = await Campaign.create({
-      logo,
+      logo: {
+        publicId: uploaded.public_id,
+        url: uploaded.secure_url,
+      },
       title,
       candidateName,
       office,
       state,
+      campaignID: generateCampaignID(),
       party,
     });
 
@@ -74,4 +92,8 @@ const addNewClient = async (req, res) => {
       message: "Failed to Create new campaign",
     });
   }
+};
+
+module.exports = {
+  addNewClient,
 };

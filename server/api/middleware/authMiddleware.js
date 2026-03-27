@@ -155,7 +155,7 @@ const verifyAdminToken = async (req, res, next) => {
 
     // Check if Admin exists and is active
     const admin = await Admin.findById(session.adminId);
-    if (!admin || admin.status !== "active") {
+    if (!admin) {
       return res.status(401).json({
         success: false,
         message: "Admin account is not active",

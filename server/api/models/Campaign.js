@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const campaignSchema = new mongoose.Schema(
   {
-    campaignId: {
+    campaignID: {
       type: String,
       required: true,
       index: true,

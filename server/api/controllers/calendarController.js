@@ -638,14 +638,14 @@ const getBatchNotificationTemplate = (events, action, performedBy, admin) => {
 /**
  * Send invitations to attendees AND ALL ADMINS
  */
-const sendInvitations = async (event, attendees) => {
+const sendInvitations = async (event, attendees, campaignId) => {
   const APP_URL = process.env.APP_URL || "http://localhost:3002";
   const eventUrl = `${APP_URL}/calendar/event/${event._id}`;
 
   console.log(`Sending invitations for event: ${event._id}`);
 
   // Get ALL admin-level users
-  const allAdmins = await getAllAdminUsers(req.user.campaignId);
+  const allAdmins = await getAllAdminUsers(campaignId);
   console.log(`Found ${allAdmins.length} admins to notify`);
 
   // Get attendee user IDs for duplicate checking
@@ -1520,11 +1520,17 @@ const createEvent = async (req, res) => {
       await firstEvent.populate("createdBy", "firstName lastName email");
       await firstEvent.populate("owner", "firstName lastName email");
 
+      const campaignId = req.user.campaignId;
+
+      console.log("this is the campaignId:", campaignId);
+      console.log("this is the user:", req.user);
+
       // Send invitations to attendees for first event and notify admins
       if (attendees?.length > 0) {
         await sendInvitations(
           firstEvent,
           attendees.map((id) => ({ user: id })),
+          req.user.campaignId,
         );
       } else {
         // Even if no attendees, notify admins

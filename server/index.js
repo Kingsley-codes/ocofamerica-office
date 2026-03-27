@@ -34,6 +34,10 @@ app
     server.use("/api/audit", require("./api/routes/audit_routes"));
     server.use("/api/auth", require("./api/routes/auth_routes"));
     server.use("/api/admin/auth", require("./api/routes/admin_auth_routes"));
+    server.use(
+      "/api/admin/dashboard",
+      require("./api/routes/admin_dashboard_routes"),
+    );
     server.use("/api/users", require("./api/routes/user_routes"));
     server.use("/api/reports", require("./api/routes/report_routes"));
     server.use("/api/media", require("./api/routes/media_routes"));
