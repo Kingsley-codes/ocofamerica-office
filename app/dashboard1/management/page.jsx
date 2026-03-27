@@ -23,17 +23,22 @@ import {
   Briefcase,
 } from "lucide-react";
 import { getInitials, generateStatusColor } from "@/lib/utils";
-import Modal from "../ui/Modal";
-import { apiRequest } from "@/lib/auth";
-import AgreementModal from "../AgreementModal";
-import DepartmentKey from "./DepartmentKey";
+import { apiRequest, validateSession } from "@/lib/auth";
 import {
   getRoleDisplayName,
   getDepartmentFromRole,
   PERMISSIONS,
 } from "@/lib/permissions";
+import { useSidebar } from "@/context/SidebarContext";
+import { useRouter } from "next/navigation";
+import Header from "@/components/dasboard1/Header";
+import Modal from "@/components/ui/Modal";
+import DepartmentKey from "@/components/dashboard/DepartmentKey";
+import AgreementModal from "@/components/AgreementModal";
 
-const ManagementDirectory = ({ user: currentUser }) => {
+export default function ManagementDirectory() {
+  const router = useRouter();
+  const { setIsOpen } = useSidebar();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -45,6 +50,7 @@ const ManagementDirectory = ({ user: currentUser }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [users, setUsers] = useState([]);
+  const [user, setUser] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -52,6 +58,35 @@ const ManagementDirectory = ({ user: currentUser }) => {
     total: 0,
     pages: 1,
   });
+
+  // Check authentication and get user data
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem("auth_token");
+
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+
+      try {
+        const sessionData = await validateSession();
+
+        if (!sessionData.valid) {
+          router.push("/login");
+          return;
+        }
+
+        setUser(sessionData.user);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Auth error:", error);
+        router.push("/login");
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   // Role options based on the PDF
   const roleOptions = [
@@ -271,11 +306,11 @@ const ManagementDirectory = ({ user: currentUser }) => {
 
   useEffect(() => {
     // Check if current user can add/delete users (Executive team only)
-    if (currentUser && currentUser.role) {
-      setCanAddDeleteUsers(PERMISSIONS.CAN_ADD_DELETE_USERS(currentUser.role));
+    if (user && user.role) {
+      setCanAddDeleteUsers(PERMISSIONS.CAN_ADD_DELETE_USERS(user.role));
     }
     fetchUsers();
-  }, [currentUser]);
+  }, [user]);
 
   // Check for required agreements
   // useEffect(() => {
@@ -316,8 +351,8 @@ const ManagementDirectory = ({ user: currentUser }) => {
 
   // Check for required agreements
   useEffect(() => {
-    if (currentUser && users.length > 0) {
-      const currentUserData = users.find((user) => user._id === currentUser.id);
+    if (user && users.length > 0) {
+      const currentUserData = users.find((user) => user._id === user.id);
 
       if (currentUserData) {
         // Only show agreement modal for volunteers
@@ -345,7 +380,7 @@ const ManagementDirectory = ({ user: currentUser }) => {
       }
     }
   }, [
-    currentUser,
+    user,
     users,
     showAgreementModal,
     showAddModal,
@@ -483,7 +518,7 @@ const ManagementDirectory = ({ user: currentUser }) => {
 
   const handleViewAgreements = async (person) => {
     try {
-      if (currentUser.id !== person._id && !canAddDeleteUsers) {
+      if (user.id !== person._id && !canAddDeleteUsers) {
         alert("You can only view your own agreements.");
         return;
       }
@@ -775,7 +810,7 @@ const ManagementDirectory = ({ user: currentUser }) => {
       >
         <Lock className="h-4 w-4" />
       </button>
-      {person._id !== currentUser?.id && (
+      {person._id !== user?.id && (
         <button
           onClick={() => handleDeleteUser(person)}
           className="text-red-600 hover:text-red-900"
@@ -857,6 +892,8 @@ const ManagementDirectory = ({ user: currentUser }) => {
 
   return (
     <div className="space-y-6">
+      <Header setIsOpen={setIsOpen} />
+
       {/* Department Key / Legend */}
       <DepartmentKey />
 
@@ -1035,7 +1072,7 @@ const ManagementDirectory = ({ user: currentUser }) => {
           setAgreementUser(null);
         }}
         user={agreementUser}
-        currentUser={currentUser}
+        currentUser={user}
         onAgreementSigned={handleAgreementSigned}
       />
 
@@ -1676,6 +1713,4 @@ const ManagementDirectory = ({ user: currentUser }) => {
       </Modal>
     </div>
   );
-};
-
-export default ManagementDirectory;
+}

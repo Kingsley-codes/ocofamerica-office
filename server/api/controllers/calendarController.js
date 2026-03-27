@@ -1520,11 +1520,6 @@ const createEvent = async (req, res) => {
       await firstEvent.populate("createdBy", "firstName lastName email");
       await firstEvent.populate("owner", "firstName lastName email");
 
-      const campaignId = req.user.campaignId;
-
-      console.log("this is the campaignId:", campaignId);
-      console.log("this is the user:", req.user);
-
       // Send invitations to attendees for first event and notify admins
       if (attendees?.length > 0) {
         await sendInvitations(

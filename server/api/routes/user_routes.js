@@ -17,14 +17,22 @@ router.use(verifyToken);
 
 // Admin only routes
 router.get("/", getAllUsers);
-router.post("/", authorize("admin"), createUser);
-router.delete("/:id", authorize("admin"), deleteUser);
-router.patch("/:id/status", authorize("admin"), updateUserStatus);
-router.patch("/:id/promote", authorize("admin", "manager"), promoteToStaff);
-router.post("/:id/reset-password", authorize("admin"), resetUserPassword);
+router.post("/", authorize("client_admin"), createUser);
+router.delete("/:id", authorize("client_admin"), deleteUser);
+router.patch("/:id/status", authorize("client_admin"), updateUserStatus);
+router.patch(
+  "/:id/promote",
+  authorize("client_admin", "manager"),
+  promoteToStaff,
+);
+router.post(
+  "/:id/reset-password",
+  authorize("client_admin"),
+  resetUserPassword,
+);
 
 // Manager and admin can update users
-router.put("/:id", authorize("admin", "manager"), updateUser);
+router.put("/:id", authorize("client_admin", "manager"), updateUser);
 
 // All authenticated users can get their own info
 router.get("/:id", getUserById);

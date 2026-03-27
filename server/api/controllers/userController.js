@@ -15,7 +15,9 @@ const getAllUsers = async (req, res) => {
   try {
     const { role, status, search, page = 1, limit = 20 } = req.query;
 
-    const query = {};
+    const query = {
+      campaign: req.user.campaignId,
+    };
 
     // Filter by role
     if (role && role !== "all") {
@@ -59,6 +61,7 @@ const getAllUsers = async (req, res) => {
       action: "View all users",
       user: req.user.userId,
       userEmail: req.user.email,
+      campaign: req.user.campaignId,
       userRole: req.user.role,
       ipAddress: req.ip,
       userAgent: req.headers["user-agent"],
@@ -202,6 +205,7 @@ const createUser = async (req, res) => {
       department,
       reportsTo,
       role,
+      campaign: req.user.campaignId,
       password: userPassword,
       createdBy: req.user.userId,
       status: "active",
@@ -241,6 +245,7 @@ const createUser = async (req, res) => {
       userRole: req.user.role,
       targetId: user._id,
       targetType: "User",
+      campaign: req.user.campaignId,
       details: { email, role, department },
       ipAddress: req.ip,
       userAgent: req.headers["user-agent"],
@@ -343,6 +348,7 @@ const updateUser = async (req, res) => {
       userEmail: req.user.email,
       userRole: req.user.role,
       targetId: user._id,
+      campaign: req.user.campaignId,
       targetType: "User",
       details: { updatedFields: Object.keys(updateData) },
       ipAddress: req.ip,
@@ -394,8 +400,11 @@ const deleteUser = async (req, res) => {
     }
 
     // Prevent deleting the last admin
-    if (user.role === "admin") {
-      const adminCount = await User.countDocuments({ role: "admin" });
+    if (user.role === "client_admin") {
+      const adminCount = await User.countDocuments({
+        role: "client_admin",
+        campaign: req.user.campaignId,
+      });
       if (adminCount <= 1) {
         return res.status(400).json({
           success: false,
@@ -414,6 +423,7 @@ const deleteUser = async (req, res) => {
       userRole: req.user.role,
       targetId: user._id,
       targetType: "User",
+      campaign: req.user.campaignId,
       details: { email: user.email, role: user.role },
       ipAddress: req.ip,
       userAgent: req.headers["user-agent"],
@@ -463,8 +473,11 @@ const updateUserStatus = async (req, res) => {
     }
 
     // Prevent deactivating last admin
-    if (user.role === "admin" && status !== "active") {
-      const adminCount = await User.countDocuments({ role: "admin" });
+    if (user.role === "client_admin" && status !== "active") {
+      const adminCount = await User.countDocuments({
+        role: "client_admin",
+        campaign: req.user.campaignId,
+      });
       if (adminCount <= 1) {
         return res.status(400).json({
           success: false,
@@ -482,6 +495,7 @@ const updateUserStatus = async (req, res) => {
       user: req.user.userId,
       userEmail: req.user.email,
       userRole: req.user.role,
+      campaign: req.user.campaignId,
       targetId: user._id,
       targetType: "User",
       details: { status },
@@ -567,6 +581,7 @@ const promoteToStaff = async (req, res) => {
       user: req.user.userId,
       userEmail: req.user.email,
       userRole: req.user.role,
+      campaign: req.user.campaignId,
       targetId: user._id,
       targetType: "User",
       details: { oldRole, newRole },
@@ -638,6 +653,7 @@ const resetUserPassword = async (req, res) => {
       user: req.user.userId,
       userEmail: req.user.email,
       userRole: req.user.role,
+      campaign: req.user.campaignId,
       targetId: user._id,
       targetType: "User",
       details: { sendEmail },

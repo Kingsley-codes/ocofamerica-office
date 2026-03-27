@@ -332,14 +332,23 @@ const verifyAdminTempToken = async (req, res, next) => {
 // Role-based authorization middleware
 const authorize = (...roles) => {
   return (req, res, next) => {
-    if (!req.user || !req.admin) {
+    // Check if we have either a user (regular user) OR an admin
+    if (!req.user && !req.admin) {
       return res.status(401).json({
         success: false,
         message: "Not authenticated",
       });
     }
 
-    if (!roles.includes(req.user.role) || !roles.includes(req.admin.role)) {
+    // Check if the authenticated entity (user or admin) has the required role
+    let userRole = null;
+    if (req.user) {
+      userRole = req.user.role;
+    } else if (req.admin) {
+      userRole = req.admin.role;
+    }
+
+    if (!roles.includes(userRole)) {
       return res.status(403).json({
         success: false,
         message: "Not authorized to access this resource",
@@ -349,7 +358,6 @@ const authorize = (...roles) => {
     next();
   };
 };
-
 module.exports = {
   verifyToken,
   verifyAdminToken,
