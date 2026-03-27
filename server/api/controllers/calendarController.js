@@ -2,10 +2,10 @@
 const CalendarEvent = require("../models/Calendar");
 const CalendarCategory = require("../models/CalendarCategory");
 const User = require("../models/User");
-const { sendEmail } = require("../../../utils/emailService");
 const ical = require("ical-generator");
 const crypto = require("crypto");
 const mongoose = require("mongoose");
+const { sendEmail } = require("../../../utils/emailService");
 
 // Category color mapping
 const CATEGORY_COLORS = {

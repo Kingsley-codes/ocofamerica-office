@@ -565,6 +565,43 @@ module.exports = {
     }
   },
 
+  sendEmail: async (to, subject, html, text = "") => {
+    console.log(`📧 Generic sendEmail to: ${to}`);
+    console.log(`📧 Subject: ${subject}`);
+
+    try {
+      const client = getZeptoClient();
+
+      if (!client) {
+        throw new Error("ZeptoMail client not initialized");
+      }
+
+      const result = await client.sendMail({
+        from: {
+          address: SENDER_EMAIL,
+          name: SENDER_NAME,
+        },
+        to: [
+          {
+            email_address: {
+              address: to,
+              name: "",
+            },
+          },
+        ],
+        subject: subject,
+        htmlbody: html,
+        textbody: text || html.replace(/<[^>]*>/g, ""),
+      });
+
+      console.log(`✅ Email sent successfully to ${to}`);
+      return { success: true, messageId: `zepto-${Date.now()}` };
+    } catch (error) {
+      console.error(`❌ Email sending failed:`, error);
+      return { success: false, error: error.message };
+    }
+  },
+
   // Send welcome email
   sendWelcomeEmail: async (email, password, userName) => {
     console.log(`👋 Sending welcome email to: ${email}`);
