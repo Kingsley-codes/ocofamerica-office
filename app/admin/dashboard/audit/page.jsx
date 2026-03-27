@@ -1,28 +1,11 @@
-// app/admin/dashboard1/page.jsx
+// app/admin/dashboard1/audit/page.jsx
 "use client";
 
-import { useState } from "react";
 import { Bell, Settings, Shield, LogOut } from "lucide-react";
+import AdminAuditLogs from "@/components/adminDashboard/AdminAuditLogs";
+import { MOCK_AUDIT_LOGS } from "@/components/adminDashboard/mockData";
 
-import CampaignDrawer from "@/components/adminDashboard/CampaignDrawer";
-import {
-  MOCK_CAMPAIGNS,
-  MOCK_AUDIT_LOGS,
-} from "@/components/adminDashboard/mockData";
-import AdminOverview from "@/components/adminDashboard/AdminOverview";
-
-export default function OverviewPage() {
-  const [campaigns, setCampaigns] = useState(MOCK_CAMPAIGNS);
-  const [selected, setSelected] = useState(null);
-
-  const handleStatusChange = (id, status) => {
-    setCampaigns((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status } : c)),
-    );
-  };
-
-  const openCampaign = (c) => setSelected(c);
-
+export default function AuditPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -80,28 +63,9 @@ export default function OverviewPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 sm:px-0">
-          <AdminOverview
-            campaigns={campaigns}
-            auditLogs={MOCK_AUDIT_LOGS}
-            onViewAllCampaigns={() =>
-              (window.location.href = "/admin/dashboard1/campaigns")
-            }
-            onViewAllAudit={() =>
-              (window.location.href = "/admin/dashboard1/audit")
-            }
-            onSelectCampaign={openCampaign}
-          />
+          <AdminAuditLogs logs={MOCK_AUDIT_LOGS} />
         </div>
       </main>
-
-      {/* Drawer */}
-      {selected && (
-        <CampaignDrawer
-          campaign={selected}
-          onClose={() => setSelected(null)}
-          onStatusChange={handleStatusChange}
-        />
-      )}
     </div>
   );
 }

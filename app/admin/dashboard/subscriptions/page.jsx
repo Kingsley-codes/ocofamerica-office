@@ -1,17 +1,14 @@
-// app/admin/dashboard1/page.jsx
+// app/admin/dashboard1/subscriptions/page.jsx
 "use client";
 
 import { useState } from "react";
 import { Bell, Settings, Shield, LogOut } from "lucide-react";
 
+import AdminSubscriptions from "@/components/adminDashboard/AdminSubscriptions";
 import CampaignDrawer from "@/components/adminDashboard/CampaignDrawer";
-import {
-  MOCK_CAMPAIGNS,
-  MOCK_AUDIT_LOGS,
-} from "@/components/adminDashboard/mockData";
-import AdminOverview from "@/components/adminDashboard/AdminOverview";
+import { MOCK_CAMPAIGNS } from "@/components/adminDashboard/mockData";
 
-export default function OverviewPage() {
+export default function SubscriptionsPage() {
   const [campaigns, setCampaigns] = useState(MOCK_CAMPAIGNS);
   const [selected, setSelected] = useState(null);
 
@@ -80,15 +77,8 @@ export default function OverviewPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 sm:px-0">
-          <AdminOverview
+          <AdminSubscriptions
             campaigns={campaigns}
-            auditLogs={MOCK_AUDIT_LOGS}
-            onViewAllCampaigns={() =>
-              (window.location.href = "/admin/dashboard1/campaigns")
-            }
-            onViewAllAudit={() =>
-              (window.location.href = "/admin/dashboard1/audit")
-            }
             onSelectCampaign={openCampaign}
           />
         </div>

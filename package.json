@@ -41,6 +41,7 @@
     "zeptomail": "^7.0.0"
   },
   "devDependencies": {
+    "@types/react": "19.2.14",
     "eslint": "^8",
     "eslint-config-next": "14.2.15",
     "postcss": "^8"

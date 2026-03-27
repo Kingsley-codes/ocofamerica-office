@@ -1,6 +1,7 @@
 "use client";
 
 import { FaTimes } from "react-icons/fa";
+import { IoHomeOutline } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 import {
   Users,
@@ -57,7 +58,7 @@ export default function Sidebar() {
       id: "home",
       label: "Home",
       route: "/dashboard1",
-      icon: Users,
+      icon: IoHomeOutline,
       requiredRoles: null,
     },
     {
