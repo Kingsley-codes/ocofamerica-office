@@ -1,4 +1,4 @@
-// app/admin/dashboard1/page.jsx
+// app/admin/dashboard/page.jsx
 "use client";
 
 import { useState } from "react";
@@ -10,8 +10,11 @@ import {
   MOCK_AUDIT_LOGS,
 } from "@/components/adminDashboard/mockData";
 import AdminOverview from "@/components/adminDashboard/AdminOverview";
+import { useSidebar } from "@/context/SidebarContext";
+import { FaBars } from "react-icons/fa";
 
 export default function OverviewPage() {
+  const { setIsOpen } = useSidebar();
   const [campaigns, setCampaigns] = useState(MOCK_CAMPAIGNS);
   const [selected, setSelected] = useState(null);
 
@@ -30,9 +33,10 @@ export default function OverviewPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Shield className="h-4 w-4 text-white" />
-              </div>
+              <FaBars
+                className="md:hidden cursor-pointer"
+                onClick={() => setIsOpen(true)}
+              />
               <div>
                 <h1 className="text-xl font-semibold text-gray-900">
                   Campaign Back Office

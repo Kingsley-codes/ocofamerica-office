@@ -1,18 +1,30 @@
 const express = require("express");
 const router = express.Router();
 const { verifyAdminToken } = require("../middleware/authMiddleware");
-const { addNewClient } = require("../controllers/adminDashboardController");
+const {
+  addNewClient,
+  fetchAllCampaigns,
+  suspendCampaign,
+  activateCampaign,
+} = require("../controllers/adminDashboardController");
 const {
   uploadLogo,
   handleUploadErrors,
 } = require("../middleware/uploadMiddleware");
 
 router.post(
-  "/clients/create",
+  "/campaign/create",
   verifyAdminToken,
   uploadLogo,
   handleUploadErrors,
   addNewClient,
+);
+router.get("/campaign", verifyAdminToken, fetchAllCampaigns);
+router.post("/campaign/suspend/:campaignId", verifyAdminToken, suspendCampaign);
+router.post(
+  "/campaign/activate/:campaignId",
+  verifyAdminToken,
+  activateCampaign,
 );
 
 module.exports = router;

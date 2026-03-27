@@ -94,6 +94,128 @@ const addNewClient = async (req, res) => {
   }
 };
 
+const fetchAllCampaigns = async (req, res) => {
+  try {
+    const { q, status, page = 1 } = req.query;
+
+    const query = {};
+
+    if (q) {
+      query.$or = [
+        { title: { $regex: q, $options: "i" } },
+        { candidateName: { $regex: q, $options: "i" } },
+        { campaignID: { $regex: q, $options: "i" } },
+      ];
+    }
+
+    if (status) {
+      query.status = status;
+    }
+
+    const limit = 10;
+    const currentPage = Number(page);
+    const skip = (currentPage - 1) * limit;
+
+    const allCanpaigns = await Campaign.find(query)
+      .populate("clientAdmin", "firstName lastName phone email")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalCampaigns = await Campaign.countDocuments(query);
+
+    return res.status(200).json({
+      status: "success",
+      campaigns: allCanpaigns,
+      pagination: {
+        total: totalCampaigns,
+        page: currentPage,
+        pages: Math.ceil(totalCampaigns / limit),
+      },
+    });
+  } catch (error) {
+    console.log("Error fetching campaigns:", error);
+    return res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+const suspendCampaign = async (req, res) => {
+  try {
+    const { campaignId } = req.params;
+
+    const campaign = await Campaign.findById(campaignId);
+
+    if (!campaign) {
+      return res.status(404).json({
+        status: "error",
+        message: "Campaign not found",
+      });
+    }
+
+    if (campaign.status === "suspended") {
+      return res.status(404).json({
+        status: "error",
+        message: "Campaign already suspended",
+      });
+    }
+
+    campaign.status = "suspended";
+    await campaign.save();
+    return res.status(200).json({
+      status: "success",
+      message: "Canpaign successfully suspended",
+    });
+  } catch (error) {
+    console.log("Error suspending campaign:", error);
+    return res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+const activateCampaign = async (req, res) => {
+  try {
+    const { campaignId } = req.params;
+
+    const campaign = await Campaign.findById(campaignId);
+
+    if (!campaign) {
+      return res.status(404).json({
+        status: "error",
+        message: "Campaign not found",
+      });
+    }
+
+    if (campaign.status === "active") {
+      return res.status(404).json({
+        status: "error",
+        message: "Campaign already active",
+      });
+    }
+
+    campaign.status = "active";
+    await campaign.save();
+
+    return res.status(200).json({
+      status: "success",
+      message: "Canpaign successfully activated",
+    });
+  } catch (error) {
+    console.log("Error activating campaign:", error);
+    return res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   addNewClient,
+  fetchAllCampaigns,
+  suspendCampaign,
+  activateCampaign,
 };

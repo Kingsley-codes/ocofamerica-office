@@ -31,6 +31,11 @@ const campaignSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    status: {
+      type: String,
+      enum: ["active", "suspended", "concluded"],
+      default: "active",
+    },
     state: {
       type: String,
       required: true,

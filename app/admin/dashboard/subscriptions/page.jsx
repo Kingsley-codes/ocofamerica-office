@@ -7,10 +7,13 @@ import { Bell, Settings, Shield, LogOut } from "lucide-react";
 import AdminSubscriptions from "@/components/adminDashboard/AdminSubscriptions";
 import CampaignDrawer from "@/components/adminDashboard/CampaignDrawer";
 import { MOCK_CAMPAIGNS } from "@/components/adminDashboard/mockData";
+import { FaBars } from "react-icons/fa";
+import { useSidebar } from "@/context/SidebarContext";
 
 export default function SubscriptionsPage() {
   const [campaigns, setCampaigns] = useState(MOCK_CAMPAIGNS);
   const [selected, setSelected] = useState(null);
+  const { setIsOpen } = useSidebar();
 
   const handleStatusChange = (id, status) => {
     setCampaigns((prev) =>
@@ -27,9 +30,10 @@ export default function SubscriptionsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Shield className="h-4 w-4 text-white" />
-              </div>
+              <FaBars
+                className="md:hidden cursor-pointer"
+                onClick={() => setIsOpen(true)}
+              />
               <div>
                 <h1 className="text-xl font-semibold text-gray-900">
                   Campaign Back Office
