@@ -1,34 +1,77 @@
 // app/admin/dashboard1/campaigns/page.jsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bell, Settings, Shield, LogOut, Plus } from "lucide-react";
 
 import AdminCampaigns from "@/components/adminDashboard/AdminCampaigns";
 import NewCampaignModal from "@/components/adminDashboard/NewCampaignModal";
 import CampaignDrawer from "@/components/adminDashboard/CampaignDrawer";
-import { MOCK_CAMPAIGNS } from "@/components/adminDashboard/mockData";
 import { FaBars } from "react-icons/fa";
 import { useSidebar } from "@/context/SidebarContext";
+import { adminApiRequest } from "@/lib/auth";
 
 export default function CampaignsPage() {
   const { setIsOpen } = useSidebar();
-  const [campaigns, setCampaigns] = useState(MOCK_CAMPAIGNS);
+  const [campaigns, setCampaigns] = useState([]);
   const [showNewModal, setShowNewModal] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const handleAddCampaign = (data) => {
-    const newCampaign = { ...data, id: Date.now() };
-    setCampaigns((prev) => [newCampaign, ...prev]);
-  };
+  // Fetch campaigns data
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        setLoading(true);
+        const data = await adminApiRequest("/admin/dashboard/campaign");
+        setCampaigns(data.campaigns || []);
+      } catch (err) {
+        setError(err.message || "Failed to load campaigns");
+        console.error("Error fetching campaigns:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleStatusChange = (id, status) => {
+    fetchCampaigns();
+  }, []);
+
+  const handleStatusChange = (campaignId, newStatus) => {
     setCampaigns((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status } : c)),
+      prev.map((c) => (c._id === campaignId ? { ...c, status: newStatus } : c)),
     );
   };
 
-  const openCampaign = (c) => setSelected(c);
+  const openCampaign = (campaign) => setSelected(campaign);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-600 text-xl mb-4">⚠️ Error</div>
+          <p className="text-gray-600">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -88,16 +131,6 @@ export default function CampaignsPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 sm:px-0">
-          <div className="mb-4">
-            <button
-              onClick={() => setShowNewModal(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              New Campaign
-            </button>
-          </div>
-
           <AdminCampaigns
             campaigns={campaigns}
             onSelectCampaign={openCampaign}
@@ -110,7 +143,9 @@ export default function CampaignsPage() {
       {showNewModal && (
         <NewCampaignModal
           onClose={() => setShowNewModal(false)}
-          onSave={handleAddCampaign}
+          onSuccess={(newCampaign) =>
+            setCampaigns((prev) => [newCampaign, ...prev])
+          }
         />
       )}
 

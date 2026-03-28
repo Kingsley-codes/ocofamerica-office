@@ -4,7 +4,8 @@
 import { useState } from "react";
 import { FiSearch, FiPlus } from "react-icons/fi";
 
-import { StatusBadge, PlanBadge, CampaignAvatar } from "./AdminBadges";
+import { StatusBadge, CampaignAvatar } from "./AdminBadges";
+import Image from "next/image";
 
 // ── Options ─────────────────────────────────────────────────────
 const STATUS_OPTIONS = [
@@ -24,7 +25,7 @@ const PLAN_OPTIONS = [
 
 // ── Main Component ──────────────────────────────────────────────
 export default function AdminCampaigns({
-  campaigns,
+  campaigns = [],
   onSelectCampaign,
   onNewCampaign,
 }) {
@@ -150,46 +151,65 @@ export default function AdminCampaigns({
                     className="hover:bg-gray-50 cursor-pointer transition-colors"
                     onClick={() => onSelectCampaign(c)}
                   >
+                    {/* Campaign ID */}
+                    <td className="px-6 py-3 text-xs text-gray-400 font-mono">
+                      {c.campaignID}
+                    </td>
+
+                    {/* Campaign title + candidate */}
                     <td className="px-6 py-3">
                       <div className="flex items-center gap-3">
-                        <CampaignAvatar name={c.candidate} />
+                        {c.logo?.url ? (
+                          <div className="h-8 w-8 relative">
+                            <Image
+                              src={c.logo.url}
+                              alt={c.title}
+                              fill
+                              className="rounded-full object-cover flex-shrink-0"
+                            />
+                          </div>
+                        ) : (
+                          <CampaignAvatar name={c.candidateName} />
+                        )}
+
                         <div>
                           <p className="text-sm font-medium text-gray-900">
                             {c.title}
                           </p>
-                          <p className="text-xs text-gray-500">{c.candidate}</p>
                         </div>
                       </div>
                     </td>
 
                     <td className="px-6 py-3">
-                      <p className="text-sm text-gray-700">{c.office}</p>
+                      <p className="text-sm font-medium text-gray-500">
+                        {c.office}
+                      </p>
                       <p className="text-xs text-gray-400">{c.state}</p>
                     </td>
 
-                    <td className="px-6 py-3">
-                      <p className="text-sm text-gray-700">{c.adminName}</p>
-                      <p className="text-xs text-gray-400">{c.adminEmail}</p>
-                    </td>
-
-                    <td className="px-6 py-3">
-                      <PlanBadge plan={c.plan} />
+                    {/* Candidate Name */}
+                    <td className="px-6 py-3 text-sm text-gray-500">
+                      {c.candidateName}
                     </td>
 
                     <td className="px-6 py-3">
                       <StatusBadge status={c.status} />
                     </td>
 
-                    <td className="px-6 py-3 text-sm font-semibold text-gray-900 whitespace-nowrap">
-                      {c.mrr ? (
-                        `$${c.mrr}/mo`
+                    {/* Campaign Admin */}
+                    <td className="px-6 py-3">
+                      {c.clientAdmin ? (
+                        <div>
+                          <p className="text-sm text-gray-900">
+                            {c.clientAdmin.firstName} {c.clientAdmin.lastName}
+                          </p>
+                          <p className="text-xs text-gray-400">
+                            {c.clientAdmin.email}
+                          </p>
+                        </div>
                       ) : (
                         <span className="text-gray-400">—</span>
                       )}
-                    </td>
-
-                    <td className="px-6 py-3 text-sm text-gray-500 whitespace-nowrap">
-                      {c.nextBilling}
                     </td>
                   </tr>
                 ))

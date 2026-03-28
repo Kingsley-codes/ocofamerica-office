@@ -231,8 +231,11 @@ export default function AdminOverview({
                     </td>
 
                     {/* Office + State */}
-                    <td className="px-6 py-3 text-sm text-gray-500">
-                      {c.office}, {c.state}
+                    <td className="px-6 py-3">
+                      <p className="text-sm font-medium text-gray-500">
+                        {c.office}
+                      </p>
+                      <p className="text-xs text-gray-400">{c.state}</p>
                     </td>
 
                     {/* Candidate Name */}

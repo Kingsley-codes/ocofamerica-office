@@ -84,6 +84,7 @@ const addNewClient = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "New campaign created successfully",
+      campaign: newCampaign,
     });
   } catch (error) {
     console.error("Create new campaign error:", error);
