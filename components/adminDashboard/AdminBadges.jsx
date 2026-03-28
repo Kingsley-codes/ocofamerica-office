@@ -95,6 +95,7 @@ const AVATAR_COLORS = [
 ];
 
 function getInitials(name) {
+  if (!name) return "?";
   return name
     .split(" ")
     .map((w) => w[0])
@@ -104,8 +105,9 @@ function getInitials(name) {
 }
 
 export function CampaignAvatar({ name, size = "md" }) {
+  const safeName = name || "";
   const color =
-    AVATAR_COLORS[(name?.charCodeAt(0) || 0) % AVATAR_COLORS.length];
+    AVATAR_COLORS[(safeName?.charCodeAt(0) || 0) % AVATAR_COLORS.length];
 
   const sizeClass =
     size === "sm"
@@ -118,7 +120,7 @@ export function CampaignAvatar({ name, size = "md" }) {
     <div
       className={`${sizeClass} ${color} rounded-lg flex items-center justify-center text-white font-semibold flex-shrink-0 select-none`}
     >
-      {getInitials(name)}
+      {getInitials(safeName)}
     </div>
   );
 }

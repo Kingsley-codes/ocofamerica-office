@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { verifyAdminToken } = require("../middleware/authMiddleware");
+const { verifyAdminToken, authorize } = require("../middleware/authMiddleware");
 const {
   addNewClient,
   fetchAllCampaigns,
@@ -15,15 +15,27 @@ const {
 router.post(
   "/campaign/create",
   verifyAdminToken,
+  authorize("admin"),
   uploadLogo,
   handleUploadErrors,
   addNewClient,
 );
-router.get("/campaign", verifyAdminToken, fetchAllCampaigns);
-router.post("/campaign/suspend/:campaignId", verifyAdminToken, suspendCampaign);
+router.get(
+  "/campaign",
+  verifyAdminToken,
+  authorize("admin"),
+  fetchAllCampaigns,
+);
+router.post(
+  "/campaign/suspend/:campaignId",
+  verifyAdminToken,
+  authorize("admin"),
+  suspendCampaign,
+);
 router.post(
   "/campaign/activate/:campaignId",
   verifyAdminToken,
+  authorize("admin"),
   activateCampaign,
 );
 

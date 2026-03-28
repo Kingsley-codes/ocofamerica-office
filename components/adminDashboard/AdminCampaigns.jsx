@@ -116,13 +116,12 @@ export default function AdminCampaigns({
             <thead className="bg-gray-50">
               <tr>
                 {[
-                  "Campaign / Candidate",
+                  "CampaignID",
+                  "Campaign",
                   "Office",
-                  "Administrator",
-                  "Plan",
+                  "Candidate",
                   "Status",
-                  "MRR",
-                  "Next Billing",
+                  "Campaign Admin",
                 ].map((h) => (
                   <th
                     key={h}

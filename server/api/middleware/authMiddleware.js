@@ -195,6 +195,10 @@ const verifyAdminToken = async (req, res, next) => {
     }
 
     if (error.name === "TokenExpiredError") {
+      console.error(
+        "Token expired error from verifyAdminToken:",
+        error.message,
+      );
       return res.status(401).json({
         success: false,
         message: "Token expired",

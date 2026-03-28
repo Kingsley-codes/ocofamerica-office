@@ -54,13 +54,13 @@ export default function CampaignDrawer({
         {/* Header */}
         <div className="px-5 py-4 border-b border-gray-200 flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <CampaignAvatar name={c.candidate} size="lg" />
+            <CampaignAvatar name={c.candidateName} size="lg" />
             <div>
               <h3 className="text-base font-semibold text-gray-900">
                 {c.title}
               </h3>
               <p className="text-sm text-gray-500">
-                {c.candidate} · {c.office}
+                {c.candidateName} · {c.office}
               </p>
             </div>
           </div>
@@ -121,9 +121,21 @@ export default function CampaignDrawer({
               Campaign Administrator
             </p>
 
-            <DetailRow icon={FiUser} label="Name" value={c.adminName} />
-            <DetailRow icon={FiMail} label="Email" value={c.adminEmail} />
-            <DetailRow icon={FiPhone} label="Phone" value={c.phone || "—"} />
+            <DetailRow
+              icon={FiUser}
+              label="Name"
+              value={`${c.clientAdmin.firstName} ${c.clientAdmin.lastName}`}
+            />
+            <DetailRow
+              icon={FiMail}
+              label="Email"
+              value={c.clientAdmin.email}
+            />
+            <DetailRow
+              icon={FiPhone}
+              label="Phone"
+              value={c.clientAdmin.phone || "—"}
+            />
             <DetailRow
               icon={FiUsers}
               label="Seats"

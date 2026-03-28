@@ -1,30 +1,95 @@
 // app/admin/dashboard/page.jsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Bell, Settings, Shield, LogOut } from "lucide-react";
 
 import CampaignDrawer from "@/components/adminDashboard/CampaignDrawer";
-import {
-  MOCK_CAMPAIGNS,
-  MOCK_AUDIT_LOGS,
-} from "@/components/adminDashboard/mockData";
 import AdminOverview from "@/components/adminDashboard/AdminOverview";
 import { useSidebar } from "@/context/SidebarContext";
 import { FaBars } from "react-icons/fa";
+import { adminApiRequest } from "@/lib/auth";
 
 export default function OverviewPage() {
   const { setIsOpen } = useSidebar();
-  const [campaigns, setCampaigns] = useState(MOCK_CAMPAIGNS);
-  const [selected, setSelected] = useState(null);
+  const [campaigns, setCampaigns] = useState([]);
+  const [auditLogs, setAuditLogs] = useState([]);
+  const [selectedCampaign, setSelectedCampaign] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const handleStatusChange = (id, status) => {
+  // Fetch campaigns data
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        setLoading(true);
+        const data = await adminApiRequest("/admin/dashboard/campaign");
+        setCampaigns(data.campaigns || []);
+      } catch (err) {
+        setError(err.message || "Failed to load campaigns");
+        console.error("Error fetching campaigns:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCampaigns();
+  }, []);
+
+  // TODO: Fetch audit logs when endpoint is available
+  // For now, keep as empty array or fetch from a real endpoint
+  useEffect(() => {
+    const fetchAuditLogs = async () => {
+      try {
+        // Replace with actual audit logs endpoint when available
+        // const data = await adminApiRequest("/admin/dashboard/audit");
+        // setAuditLogs(data.logs || []);
+
+        // Using mock data temporarily
+        setAuditLogs([]);
+      } catch (err) {
+        console.error("Error fetching audit logs:", err);
+      }
+    };
+
+    fetchAuditLogs();
+  }, []);
+
+  const handleStatusChange = (campaignId, newStatus) => {
     setCampaigns((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status } : c)),
+      prev.map((c) => (c._id === campaignId ? { ...c, status: newStatus } : c)),
     );
   };
 
-  const openCampaign = (c) => setSelected(c);
+  const openCampaign = (campaign) => setSelectedCampaign(campaign);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-600 text-xl mb-4">⚠️ Error</div>
+          <p className="text-gray-600">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -86,12 +151,13 @@ export default function OverviewPage() {
         <div className="px-4 sm:px-0">
           <AdminOverview
             campaigns={campaigns}
-            auditLogs={MOCK_AUDIT_LOGS}
+            auditLogs={auditLogs}
+            loading={loading}
             onViewAllCampaigns={() =>
-              (window.location.href = "/admin/dashboard1/campaigns")
+              (window.location.href = "/admin/dashboard/campaigns")
             }
             onViewAllAudit={() =>
-              (window.location.href = "/admin/dashboard1/audit")
+              (window.location.href = "/admin/dashboard/audit")
             }
             onSelectCampaign={openCampaign}
           />
@@ -99,10 +165,10 @@ export default function OverviewPage() {
       </main>
 
       {/* Drawer */}
-      {selected && (
+      {selectedCampaign && (
         <CampaignDrawer
-          campaign={selected}
-          onClose={() => setSelected(null)}
+          campaign={selectedCampaign}
+          onClose={() => setSelectedCampaign(null)}
           onStatusChange={handleStatusChange}
         />
       )}

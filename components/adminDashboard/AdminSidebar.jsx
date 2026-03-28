@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Flag, LayoutDashboard, CreditCard, FileText } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 export default function AdminSidebar() {
   const { isOpen, setIsOpen } = useSidebar();
@@ -15,25 +16,25 @@ export default function AdminSidebar() {
     {
       id: "overview",
       label: "Overview",
-      route: "/admin/dashboard",
+      href: "/admin/dashboard",
       icon: LayoutDashboard,
     },
     {
       id: "campaigns",
       label: "Campaigns",
-      route: "/admin/dashboard/campaigns",
+      href: "/admin/dashboard/campaigns",
       icon: Flag,
     },
     {
       id: "subscriptions",
       label: "Subscriptions",
-      route: "/admin/dashboard/subscriptions",
+      href: "/admin/dashboard/subscriptions",
       icon: CreditCard,
     },
     {
       id: "audit",
       label: "Audit Logs",
-      route: "/admin/dashboard/audit",
+      href: "/admin/dashboard/audit",
       icon: FileText,
     },
   ];
@@ -71,16 +72,16 @@ export default function AdminSidebar() {
         </h2>
 
         {/* ✅ Dynamic Tabs */}
-        <ul className="space-y-3">
+        <nav className="flex flex-col gap-2 w-full">
           {allTabs.map((tab) => {
             const Icon = tab.icon;
-            const isActive = pathname === tab.route;
+            const isActive = pathname === tab.href;
 
             return (
-              <li
+              <Link
                 key={tab.id}
+                href={tab.href}
                 onClick={() => {
-                  router.push(tab.route);
                   setIsOpen(false); // close on mobile
                 }}
                 className={`
@@ -94,10 +95,10 @@ export default function AdminSidebar() {
               >
                 <Icon size={18} />
                 <span>{tab.label}</span>
-              </li>
+              </Link>
             );
           })}
-        </ul>
+        </nav>
       </div>
     </>
   );
